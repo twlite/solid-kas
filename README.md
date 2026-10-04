@@ -1,5 +1,7 @@
 # Solid KAS prototype
 
+![Solid KAS calculator](./assets/image.webp)
+
 This workspace renders SolidJS components as native KAS widgets inside one Rust process. QuickJS evaluates the Vite-transformed application modules. The application runtime contains no browser, DOM, WebView, Node.js process, frontend/backend split, or IPC application layer.
 
 The prototype intentionally supports only `Column`, `Row`, `Text`, `Button`, children, text updates, and `onClick`.

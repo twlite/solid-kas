@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.vite/
+*.log
+
+# Native build output. The cached debug binary is intentionally not checked in.
+target/
+# Local environment overrides.
+.env
+.env.*
+!.env.example

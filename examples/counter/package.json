@@ -1,0 +1,21 @@
+{
+  "name": "@kas/counter",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "predev": "pnpm --filter @kas/vite build",
+    "dev": "vite",
+    "prebuild": "pnpm --filter @kas/vite build",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@kas/solid": "workspace:*",
+    "solid-js": "1.9.15"
+  },
+  "devDependencies": {
+    "@kas/vite": "workspace:*",
+    "vite": "8.3.2",
+    "vite-plugin-solid": "2.11.14"
+  }
+}

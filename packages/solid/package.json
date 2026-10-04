@@ -1,0 +1,33 @@
+{
+  "name": "@kas/solid",
+  "version": "0.1.0",
+  "description": "SolidJS universal renderer for the KAS widget host",
+  "type": "module",
+  "sideEffects": true,
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.test.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "solid-js": "1.9.15"
+  },
+  "devDependencies": {
+    "@types/node": "22.15.21",
+    "typescript": "5.8.3",
+    "vitest": "3.1.2"
+  }
+}

@@ -88,6 +88,7 @@ impl Engine {
                 .collect::<HashMap<_, _>>(),
         );
         let runtime = Runtime::new().map_err(|error| error.to_string())?;
+        runtime.set_max_stack_size(2 * 1024 * 1024);
         runtime.set_loader(GraphModules(modules.clone()), GraphModules(modules));
         let context = Context::full(&runtime).map_err(|error| error.to_string())?;
 

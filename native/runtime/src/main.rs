@@ -29,6 +29,9 @@ struct Activate(u32);
 #[derive(Clone, Debug)]
 struct Refresh;
 
+#[derive(Clone, Debug)]
+struct CenterWindow;
+
 struct Data {
     model: Rc<RefCell<Model>>,
     engine: RefCell<Option<Engine>>,
@@ -100,6 +103,16 @@ fn widget_for(data: &Data, handle: Handle) -> DynWidget {
                     .collect::<Vec<_>>(),
             ))
         }
+        NodeKind::Element(ElementKind::Row) => {
+            let children = node.children.clone();
+            drop(model);
+            Box::new(Row::new(
+                children
+                    .into_iter()
+                    .map(|child| widget_for(data, child))
+                    .collect::<Vec<_>>(),
+            ))
+        }
         NodeKind::Element(ElementKind::Text) => {
             let text = model.display_text(handle).unwrap_or_default();
             Box::new(Label::new(text).map_any::<Data>())
@@ -152,9 +165,26 @@ fn make_ui(data: &Data) -> impl Widget<Data = Data> + use<> {
     Column::new(snapshot(data))
         .on_configure(|cx, _| {
             let id = cx.id();
-            cx.set_send_target_for::<Reload>(id);
+            cx.set_send_target_for::<Reload>(id.clone());
+            cx.set_send_target_for::<CenterWindow>(id);
         })
         .on_messages(|cx, column, data| {
+            if cx.try_pop::<CenterWindow>().is_some()
+                && let Some(window) = cx.winit_window()
+                && let Some(monitor) = window.current_monitor()
+                && let Some(video_mode) = monitor.current_video_mode()
+                && let Some(monitor_position) = monitor.position()
+            {
+                let monitor_size = video_mode.size();
+                let window_size = window.outer_size();
+                let x = monitor_position.x
+                    + (monitor_size.width.saturating_sub(window_size.width) / 2) as i32;
+                let y = monitor_position.y
+                    + (monitor_size.height.saturating_sub(window_size.height) / 2) as i32;
+                window.set_outer_position(winit::dpi::Position::Physical(
+                    winit::dpi::PhysicalPosition::new(x, y),
+                ));
+            }
             if let Some(Reload(graph)) = cx.try_pop() {
                 data.reload(&graph);
                 replace_snapshot(cx, column, data);
@@ -214,14 +244,22 @@ fn spawn_dev_reader(mut proxy: kas::runner::Proxy, address: String) {
     });
 }
 
+fn spawn_center_request(mut proxy: kas::runner::Proxy) {
+    thread::spawn(move || {
+        thread::sleep(Duration::from_millis(150));
+        let _ = proxy.push(CenterWindow);
+    });
+}
+
 fn run() -> Result<(), Box<dyn std::error::Error>> {
     let data = Data::new();
     if !EMBEDDED_PAYLOAD.is_empty() {
         let code = String::from_utf8(EMBEDDED_PAYLOAD.to_vec())?;
         data.reload(&ModuleGraph::production(code));
     }
-    let ui = make_ui(&data);
+    let ui = make_ui(&data).with_min_size_px(520, 640);
     let mut runner = kas::runner::Runner::new(data)?;
+    spawn_center_request(runner.create_proxy());
     if let Ok(address) = env::var("KAS_DEV_SOCKET") {
         spawn_dev_reader(runner.create_proxy(), address);
     }

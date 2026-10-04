@@ -65,6 +65,13 @@ class DevRuntime implements KasRuntime {
   private readonly state: RuntimeState;
   private readonly options: ResolvedKasOptions;
   private readonly spawnCommand?: SpawnCommand;
+  private closePromise?: Promise<void>;
+  private readonly killChildOnExit = () => {
+    const child = this.child;
+    if (child && !child.killed) {
+      child.kill();
+    }
+  };
 
   constructor(options: ResolvedKasOptions, spawnCommand?: SpawnCommand) {
     this.options = options;
@@ -99,6 +106,11 @@ class DevRuntime implements KasRuntime {
     });
     this.child = spawned.child;
     this.state.child = spawned.child;
+    // The native window must not keep the Vite CLI process alive after Ctrl+C.
+    // The synchronous exit hook still terminates it if Vite exits before its
+    // asynchronous server-close lifecycle has completed.
+    this.child.unref();
+    process.once("exit", this.killChildOnExit);
     this.child.once("error", (error) => {
       console.error(`[kas] native host error: ${error.message}`);
     });
@@ -183,7 +195,13 @@ class DevRuntime implements KasRuntime {
     }
   }
 
-  async close(): Promise<void> {
+  close(): Promise<void> {
+    this.closePromise ??= this.closeImpl();
+    return this.closePromise;
+  }
+
+  private async closeImpl(): Promise<void> {
+    process.off("exit", this.killChildOnExit);
     const child = this.child;
     if (child && !child.killed) {
       child.kill();
@@ -289,7 +307,43 @@ export function createKasPlugin(options: CreateKasPluginOptions = {}): Plugin & 
           console.error(`[kas] failed to close native host: ${String(error)}`);
         });
       };
-      server.httpServer?.once("close", closeRuntime);
+      let shuttingDown = false;
+      const removeSignalHandlers = () => {
+        process.off("SIGINT", onSigint);
+        process.off("SIGTERM", onSigterm);
+        process.stdin.off("data", onStdin);
+      };
+      const shutdown = (exitCode: number) => {
+        if (shuttingDown) {
+          return;
+        }
+        shuttingDown = true;
+
+        // close() kills the native process synchronously before its first
+        // await. This matters on Windows where another CLI signal listener may
+        // exit Node immediately after this listener returns.
+        const runtimeClose = currentRuntime.close();
+        void Promise.allSettled([runtimeClose, server.close()]).then(() => {
+          removeSignalHandlers();
+          process.exit(exitCode);
+        });
+      };
+      const onSigint = () => shutdown(130);
+      const onSigterm = () => shutdown(143);
+      const onStdin = (chunk: Buffer | string) => {
+        const input = typeof chunk === "string" ? Buffer.from(chunk) : chunk;
+        if (input.includes(3)) {
+          shutdown(130);
+        }
+      };
+
+      process.prependOnceListener("SIGINT", onSigint);
+      process.prependOnceListener("SIGTERM", onSigterm);
+      process.stdin.on("data", onStdin);
+      server.httpServer?.once("close", () => {
+        removeSignalHandlers();
+        closeRuntime();
+      });
       return undefined;
     },
 

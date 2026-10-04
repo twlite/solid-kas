@@ -1,6 +1,9 @@
 use std::{env, fs, path::PathBuf};
 
 fn main() {
+    if cfg!(target_os = "windows") {
+        println!("cargo:rustc-link-arg=/STACK:8388608");
+    }
     println!("cargo:rerun-if-env-changed=KAS_PAYLOAD_PATH");
     println!("cargo:rerun-if-env-changed=KAS_JS_PAYLOAD");
 

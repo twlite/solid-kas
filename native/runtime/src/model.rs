@@ -9,6 +9,7 @@ pub enum ElementKind {
     Column,
     Text,
     Button,
+    Row,
 }
 
 impl TryFrom<u32> for ElementKind {
@@ -19,6 +20,7 @@ impl TryFrom<u32> for ElementKind {
             0 => Ok(Self::Column),
             1 => Ok(Self::Text),
             2 => Ok(Self::Button),
+            3 => Ok(Self::Row),
             _ => Err(ModelError::InvalidKind(value)),
         }
     }

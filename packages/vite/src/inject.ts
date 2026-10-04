@@ -1,4 +1,4 @@
-const COMPONENTS = ["Column", "Text", "Button"] as const;
+const COMPONENTS = ["Column", "Row", "Text", "Button"] as const;
 const COMPONENT_IMPORT_SOURCE = "@kas/solid";
 
 function maskNonCode(source: string): string {
@@ -105,7 +105,7 @@ function usesJsxComponent(source: string, component: string): boolean {
 
 /**
  * Main.tsx intentionally keeps the small example syntax readable and does
- * not import the three host components. This transform supplies those imports
+ * not import the host components. This transform supplies those imports
  * before vite-plugin-solid processes the TSX.
  */
 export function injectKasComponents(source: string): { code: string; injected: string[] } {

@@ -2,7 +2,7 @@
 
 This workspace renders SolidJS components as native KAS widgets inside one Rust process. QuickJS evaluates the Vite-transformed application modules. The application runtime contains no browser, DOM, WebView, Node.js process, frontend/backend split, or IPC application layer.
 
-The prototype intentionally supports only `Column`, `Text`, `Button`, children, text updates, and `onClick`.
+The prototype intentionally supports only `Column`, `Row`, `Text`, `Button`, children, text updates, and `onClick`.
 
 ## Prerequisites
 
@@ -65,7 +65,7 @@ Remove-Item Env:RUSTFLAGS
 ## Workspace layout
 
 - `packages/vite`: Vite plugin, transformed module graph transport, dev host lifecycle, and production Cargo orchestration
-- `packages/solid`: Solid universal renderer and typed `Column`, `Text`, and `Button` primitives
+- `packages/solid`: Solid universal renderer and typed `Column`, `Row`, `Text`, and `Button` primitives
 - `native/runtime`: KAS window, QuickJS module loader, validated numeric handle model, and native event adapter
 - `examples/counter`: calculator application and Vite configuration
 
@@ -74,7 +74,7 @@ See `ARCHITECTURE.md` for the integration boundaries and design decisions.
 ## Current limits
 
 - Windows host only
-- Three widgets only
+- Four widgets only
 - Full Solid root reload for source edits, with state loss
 - No CSS, DOM compatibility, routing, app networking APIs, async components, or platform packaging
 - The KAS adapter rebuilds this small widget subtree after model changes instead of exposing a general mutable KAS tree API

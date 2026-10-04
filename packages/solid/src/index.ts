@@ -5,11 +5,12 @@ export const KasElementKind = {
   Column: 0,
   Label: 1,
   Text: 1,
-  Button: 2
+  Button: 2,
+  Row: 3
 } as const;
 
 export type KasElementKind = (typeof KasElementKind)[keyof typeof KasElementKind];
-export type KasElementTag = "Column" | "Text" | "Label" | "Button";
+export type KasElementTag = "Column" | "Row" | "Text" | "Label" | "Button";
 export type KasClickHandler = (...args: any[]) => unknown;
 export type KasDispatch = (callbackId: number, ...args: unknown[]) => unknown;
 
@@ -95,6 +96,8 @@ export interface ColumnProps {
   children?: JSX.Element;
 }
 
+export interface RowProps extends ColumnProps {}
+
 export interface TextProps {
   children?: JSX.Element;
 }
@@ -120,6 +123,8 @@ const hostAliases = {
 const tagKinds: Record<string, KasElementKind> = {
   Column: KasElementKind.Column,
   column: KasElementKind.Column,
+  Row: KasElementKind.Row,
+  row: KasElementKind.Row,
   Text: KasElementKind.Text,
   text: KasElementKind.Text,
   Label: KasElementKind.Label,
@@ -628,6 +633,12 @@ export function Column(props: ColumnProps): JSX.Element {
   return node as unknown as JSX.Element;
 }
 
+export function Row(props: RowProps): JSX.Element {
+  const node = universalRenderer.createElement("Row");
+  universalRenderer.spread(node, props);
+  return node as unknown as JSX.Element;
+}
+
 export function Text(props: TextProps): JSX.Element {
   const node = universalRenderer.createElement("Text");
   universalRenderer.spread(node, props);
@@ -649,6 +660,7 @@ declare global {
   namespace JSX {
     interface IntrinsicElements {
       Column: ColumnProps;
+      Row: RowProps;
       Text: TextProps;
       Button: ButtonProps;
     }
@@ -659,6 +671,7 @@ declare module "solid-js" {
   namespace JSX {
     interface IntrinsicElements {
       Column: ColumnProps;
+      Row: RowProps;
       Text: TextProps;
       Button: ButtonProps;
     }

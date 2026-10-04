@@ -6,7 +6,7 @@
   "scripts": {
     "bootstrap": "cargo build -p kas-runtime",
     "predev": "pnpm --filter @kas/solid build && pnpm --filter @kas/vite build",
-    "dev": "pnpm --filter @kas/counter dev",
+    "dev": "vite examples/counter",
     "prebuild": "pnpm --filter @kas/solid build && pnpm --filter @kas/vite build",
     "build": "pnpm --filter @kas/counter build",
     "test": "pnpm --filter @kas/solid test && pnpm --filter @kas/vite test",

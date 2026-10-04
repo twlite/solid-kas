@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "predev": "pnpm --filter @kas/vite build",
+    "predev": "pnpm --filter @kas/solid build && pnpm --filter @kas/vite build",
     "dev": "vite",
-    "prebuild": "pnpm --filter @kas/vite build",
+    "prebuild": "pnpm --filter @kas/solid build && pnpm --filter @kas/vite build",
     "build": "vite build"
   },
   "dependencies": {

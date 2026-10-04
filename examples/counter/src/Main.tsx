@@ -92,24 +92,34 @@ export default function Main() {
   return (
     <Column>
       <Text>{calculator().display}</Text>
-      <Button onClick={() => setCalculator(initialCalculator())}>Clear</Button>
-      <Button onClick={toggleSign}>+/-</Button>
-      <Button onClick={() => digit("7")}>7</Button>
-      <Button onClick={() => digit("8")}>8</Button>
-      <Button onClick={() => digit("9")}>9</Button>
-      <Button onClick={() => digit("4")}>4</Button>
-      <Button onClick={() => digit("5")}>5</Button>
-      <Button onClick={() => digit("6")}>6</Button>
-      <Button onClick={() => digit("1")}>1</Button>
-      <Button onClick={() => digit("2")}>2</Button>
-      <Button onClick={() => digit("3")}>3</Button>
-      <Button onClick={() => digit("0")}>0</Button>
-      <Button onClick={decimal}>.</Button>
-      <Button onClick={() => chooseOperator("+")}>+</Button>
-      <Button onClick={() => chooseOperator("-")}>-</Button>
-      <Button onClick={() => chooseOperator("*")}>*</Button>
-      <Button onClick={() => chooseOperator("/")}>/</Button>
-      <Button onClick={equals}>=</Button>
+      <Row>
+        <Button onClick={() => setCalculator(initialCalculator())}>C</Button>
+        <Button onClick={toggleSign}>+/-</Button>
+        <Button onClick={() => chooseOperator("/")}>/</Button>
+        <Button onClick={() => chooseOperator("*")}>*</Button>
+      </Row>
+      <Row>
+        <Button onClick={() => digit("7")}>7</Button>
+        <Button onClick={() => digit("8")}>8</Button>
+        <Button onClick={() => digit("9")}>9</Button>
+        <Button onClick={() => chooseOperator("-")}>-</Button>
+      </Row>
+      <Row>
+        <Button onClick={() => digit("4")}>4</Button>
+        <Button onClick={() => digit("5")}>5</Button>
+        <Button onClick={() => digit("6")}>6</Button>
+        <Button onClick={() => chooseOperator("+")}>+</Button>
+      </Row>
+      <Row>
+        <Button onClick={() => digit("1")}>1</Button>
+        <Button onClick={() => digit("2")}>2</Button>
+        <Button onClick={() => digit("3")}>3</Button>
+        <Button onClick={equals}>=</Button>
+      </Row>
+      <Row>
+        <Button onClick={() => digit("0")}>0</Button>
+        <Button onClick={decimal}>.</Button>
+      </Row>
     </Column>
   );
 }
